@@ -54,8 +54,12 @@ export default function Hero() {
             <div className="absolute inset-0 rounded-full border border-teal-200" aria-hidden="true" />
             <div className="absolute inset-6 rounded-full border border-teal-300/70" aria-hidden="true" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-teal-900 shadow-lift sm:h-32 sm:w-32">
-                <ShieldCheck className="h-14 w-14 text-white" strokeWidth={1.5} aria-hidden="true" />
+              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-white p-2.5 shadow-lift ring-4 ring-teal-900/10 sm:h-32 sm:w-32">
+                <img
+                  src="/images/logo.png"
+                  alt="3Sconsulting Emblem"
+                  className="h-full w-full object-contain drop-shadow-xs"
+                />
               </div>
             </div>
 
