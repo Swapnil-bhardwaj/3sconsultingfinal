@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, Download, FileText, ArrowRight, Eye, X, ShieldCheck, Sparkles, BookOpen } from "lucide-react";
+import { Search, Download, FileText, ArrowRight, Eye, X, ShieldCheck, Sparkles, BookOpen, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import PageHero from "../components/ui/PageHero";
 import Container from "../components/ui/Container";
@@ -16,6 +16,13 @@ export default function LearningResources() {
   const [previewDoc, setPreviewDoc] = useState<Resource | null>(null);
 
   const cleanQuery = sanitizeText(query).toLowerCase();
+
+  const handleCategorySelect = (catName: string) => {
+    setActiveCategory(catName);
+    setTimeout(() => {
+      document.getElementById("resources-list-section")?.scrollIntoView({ behavior: "smooth" });
+    }, 50);
+  };
 
   const filtered = useMemo(() => {
     return latestResources.filter((r) => {
@@ -81,21 +88,21 @@ export default function LearningResources() {
         </div>
       </PageHero>
 
-      {/* Category Pills & Filters */}
+      {/* Category Selection Cards */}
       <section className="py-14 lg:py-16">
         <Container>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.14em] text-teal-700">Resource Categories</p>
-              <h2 className="mt-1 text-2xl font-bold text-ink-950">Select a category</h2>
+              <h2 className="mt-1 text-2xl font-bold text-ink-950">Select a category to explore</h2>
             </div>
             <button
               type="button"
-              onClick={() => setActiveCategory("All")}
+              onClick={() => handleCategorySelect("All")}
               className={cn(
-                "w-fit rounded-full px-5 py-2 text-sm font-semibold transition-colors border",
+                "w-fit rounded-full px-5 py-2.5 text-sm font-semibold transition-all border cursor-pointer",
                 activeCategory === "All"
-                  ? "bg-teal-800 text-white border-teal-800"
+                  ? "bg-teal-800 text-white border-teal-800 shadow-sm"
                   : "bg-white text-ink-700 border-ink-200 hover:border-teal-400"
               )}
             >
@@ -105,39 +112,60 @@ export default function LearningResources() {
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {resourceCategories.map((cat) => (
-              <button
+              <div
                 key={cat.name}
-                type="button"
-                onClick={() => setActiveCategory(cat.name === activeCategory ? "All" : cat.name)}
-                aria-pressed={activeCategory === cat.name}
+                onClick={() => handleCategorySelect(cat.name)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleCategorySelect(cat.name);
+                  }
+                }}
                 className={cn(
-                  "group flex items-start gap-5 rounded-2xl border p-7 text-left transition-all duration-200",
+                  "group flex flex-col justify-between rounded-2xl border p-7 text-left transition-all duration-300 cursor-pointer shadow-soft hover:-translate-y-1 hover:shadow-lift",
                   activeCategory === cat.name
-                    ? "border-teal-700 bg-teal-50 shadow-md ring-1 ring-teal-700"
-                    : "border-ink-200 bg-white hover:border-teal-300 hover:shadow-soft"
+                    ? "border-teal-700 bg-teal-50/90 ring-2 ring-teal-700"
+                    : "border-ink-200 bg-white hover:border-teal-400"
                 )}
               >
-                <div
-                  className={cn(
-                    "flex h-14 w-14 shrink-0 items-center justify-center rounded-xl transition-colors",
-                    activeCategory === cat.name ? "bg-teal-700 text-white" : "bg-teal-50 text-teal-700 group-hover:bg-teal-700 group-hover:text-white"
-                  )}
-                >
-                  <cat.icon className="h-7 w-7" strokeWidth={1.75} aria-hidden="true" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-lg font-bold text-ink-950">{cat.name}</p>
-                    <span className="rounded-full bg-teal-100/80 px-2.5 py-0.5 text-xs font-semibold text-teal-900">
-                      {cat.count} items
-                    </span>
+                <div className="flex items-start gap-5">
+                  <div
+                    className={cn(
+                      "flex h-14 w-14 shrink-0 items-center justify-center rounded-xl transition-colors",
+                      activeCategory === cat.name
+                        ? "bg-teal-700 text-white"
+                        : "bg-teal-50 text-teal-700 group-hover:bg-teal-700 group-hover:text-white"
+                    )}
+                  >
+                    <cat.icon className="h-7 w-7" strokeWidth={1.75} aria-hidden="true" />
                   </div>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-600">{cat.description}</p>
-                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-teal-800">
-                    Filter by {cat.name} →
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xl font-bold text-ink-950">{cat.name}</p>
+                      <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-bold text-teal-900">
+                        {cat.name === "Downloads" ? "6 Verified PDFs" : "3 In-Depth Articles"}
+                      </span>
+                    </div>
+                    <p className="mt-2.5 text-sm leading-relaxed text-ink-600">{cat.description}</p>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-ink-100 flex items-center justify-between text-xs font-bold text-teal-800 group-hover:text-teal-900">
+                  <span className="flex items-center gap-1.5">
+                    {activeCategory === cat.name ? (
+                      <>
+                        <Check className="h-4 w-4 text-teal-700" /> Filter Active (Showing below)
+                      </>
+                    ) : (
+                      <>View {cat.name} List ↓</>
+                    )}
+                  </span>
+                  <span className="rounded-lg bg-white px-3 py-1.5 border border-ink-200 shadow-2xs group-hover:border-teal-400">
+                    Click to Open →
                   </span>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         </Container>
@@ -184,7 +212,7 @@ export default function LearningResources() {
                   <button
                     type="button"
                     onClick={() => setPreviewDoc(featuredResource)}
-                    className="inline-flex items-center gap-2 rounded-xl border border-ink-300 bg-white px-5 py-3.5 text-sm font-bold text-ink-800 transition-colors hover:border-teal-400 hover:text-teal-800"
+                    className="inline-flex items-center gap-2 rounded-xl border border-ink-300 bg-white px-5 py-3.5 text-sm font-bold text-ink-800 transition-colors hover:border-teal-400 hover:text-teal-800 cursor-pointer"
                   >
                     <Eye className="h-4.5 w-4.5" />
                     Quick Preview
@@ -204,16 +232,59 @@ export default function LearningResources() {
       </section>
 
       {/* Grid of All Resources (PDF Downloads & Articles) */}
-      <section className="py-16 lg:py-24">
+      <section id="resources-list-section" className="py-16 lg:py-24 scroll-mt-20">
         <Container>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-ink-200 pb-6">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.14em] text-teal-700">Browse Study Series</p>
-              <h2 className="mt-2 text-2xl font-bold text-ink-950">
-                {activeCategory === "All" ? "All NEBOSH Materials & Articles" : activeCategory}
+              <h2 className="mt-1 text-2xl font-bold text-ink-950 sm:text-3xl">
+                {activeCategory === "All"
+                  ? "All NEBOSH Materials & Articles"
+                  : activeCategory === "Downloads"
+                  ? "Downloadable PDF Study Materials"
+                  : "Technical Articles & Guides"}
               </h2>
             </div>
-            <p className="text-sm text-ink-500">{filtered.length} resources available</p>
+            
+            {/* Quick Filter Tabs */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveCategory("All")}
+                className={cn(
+                  "rounded-full px-4 py-2 text-xs font-bold transition-colors cursor-pointer",
+                  activeCategory === "All"
+                    ? "bg-teal-800 text-white"
+                    : "bg-paper-dim text-ink-700 hover:bg-teal-100"
+                )}
+              >
+                All ({latestResources.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCategory("Downloads")}
+                className={cn(
+                  "rounded-full px-4 py-2 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1",
+                  activeCategory === "Downloads"
+                    ? "bg-green-700 text-white"
+                    : "bg-paper-dim text-ink-700 hover:bg-green-100"
+                )}
+              >
+                <Download className="h-3 w-3" /> Downloads (6)
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCategory("Articles")}
+                className={cn(
+                  "rounded-full px-4 py-2 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1",
+                  activeCategory === "Articles"
+                    ? "bg-teal-800 text-white"
+                    : "bg-paper-dim text-ink-700 hover:bg-teal-100"
+                )}
+              >
+                <FileText className="h-3 w-3" /> Articles (3)
+              </button>
+            </div>
           </div>
 
           {filtered.length === 0 ? (
@@ -225,7 +296,7 @@ export default function LearningResources() {
                   setQuery("");
                   setActiveCategory("All");
                 }}
-                className="mt-4 text-sm font-semibold text-teal-800 hover:underline"
+                className="mt-4 text-sm font-semibold text-teal-800 hover:underline cursor-pointer"
               >
                 Reset filters
               </button>
@@ -279,7 +350,7 @@ export default function LearningResources() {
                           <button
                             type="button"
                             onClick={() => setPreviewDoc(r)}
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-ink-600 hover:text-teal-800"
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-ink-600 hover:text-teal-800 cursor-pointer"
                           >
                             <Eye className="h-3.5 w-3.5" /> Preview
                           </button>
@@ -341,7 +412,7 @@ export default function LearningResources() {
             <button
               type="button"
               onClick={() => setPreviewDoc(null)}
-              className="absolute top-5 right-5 rounded-full p-1 text-ink-500 hover:bg-ink-100"
+              className="absolute top-5 right-5 rounded-full p-1 text-ink-500 hover:bg-ink-100 cursor-pointer"
               aria-label="Close modal"
             >
               <X className="h-5 w-5" />
@@ -382,7 +453,7 @@ export default function LearningResources() {
               <button
                 type="button"
                 onClick={() => setPreviewDoc(null)}
-                className="rounded-xl border border-ink-300 px-5 py-2.5 text-xs font-bold text-ink-700 hover:bg-ink-50"
+                className="rounded-xl border border-ink-300 px-5 py-2.5 text-xs font-bold text-ink-700 hover:bg-ink-50 cursor-pointer"
               >
                 Close Preview
               </button>

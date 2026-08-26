@@ -8,6 +8,8 @@ import Button from "../components/ui/Button";
 import { BlogPost } from "../data/blogs";
 import { getBlogBySlug, getAllBlogs, deleteBlogPost } from "../utils/blogStorage";
 
+import RichBlogContent from "../components/blog/RichBlogContent";
+
 export default function BlogDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -58,9 +60,6 @@ export default function BlogDetail() {
       navigate("/blog");
     }
   };
-
-  // Render markdown-like sections or text paragraphs nicely
-  const paragraphs = post.content.split(/\n\s*\n/);
 
   return (
     <>
@@ -162,42 +161,8 @@ export default function BlogDetail() {
         <Container>
           <div className="grid grid-cols-1 gap-14 lg:grid-cols-12">
             <article className="lg:col-span-8">
-              <div className="prose max-w-none space-y-6 text-[17px] leading-[1.8] text-ink-800">
-                {paragraphs.map((p, idx) => {
-                  const trimmed = p.trim();
-                  if (trimmed.startsWith("### ")) {
-                    return (
-                      <h3
-                        key={idx}
-                        className="mt-8 text-2xl font-bold tracking-tight text-ink-950 border-b border-ink-100 pb-2"
-                      >
-                        {trimmed.replace(/^###\s+/, "")}
-                      </h3>
-                    );
-                  }
-                  if (trimmed.startsWith("## ")) {
-                    return (
-                      <h2 key={idx} className="mt-10 text-3xl font-bold tracking-tight text-ink-950">
-                        {trimmed.replace(/^##\s+/, "")}
-                      </h2>
-                    );
-                  }
-                  if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-                    const items = trimmed.split("\n").map((line) => line.replace(/^[-*]\s+/, ""));
-                    return (
-                      <ul key={idx} className="my-4 space-y-2 list-disc pl-6 text-ink-700">
-                        {items.map((it, i) => (
-                          <li key={i}>{it}</li>
-                        ))}
-                      </ul>
-                    );
-                  }
-                  return (
-                    <p key={idx} className="text-ink-700">
-                      {trimmed}
-                    </p>
-                  );
-                })}
+              <div className="rounded-2xl border border-ink-100 bg-white p-6 sm:p-10 shadow-soft">
+                <RichBlogContent content={post.content} />
               </div>
 
               {/* Tags */}

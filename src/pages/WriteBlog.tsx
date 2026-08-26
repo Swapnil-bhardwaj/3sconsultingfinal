@@ -15,6 +15,7 @@ import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
 import { blogCategories, presetCoverImages, BlogPost } from "../data/blogs";
 import { saveBlogPost } from "../utils/blogStorage";
+import RichBlogContent from "../components/blog/RichBlogContent";
 
 export default function WriteBlog() {
   const navigate = useNavigate();
@@ -409,28 +410,9 @@ Leave blank lines between paragraphs."
                   <img src={selectedImage} alt="Cover Preview" className="h-72 w-full object-cover" />
                 </div>
 
-                <div className="space-y-5 text-base leading-relaxed text-ink-800">
-                  {previewParagraphs.length > 0 && previewParagraphs[0] ? (
-                    previewParagraphs.map((p, idx) => {
-                      const trimmed = p.trim();
-                      if (trimmed.startsWith("### ")) {
-                        return (
-                          <h3 key={idx} className="mt-6 text-xl font-bold text-ink-950">
-                            {trimmed.replace(/^###\s+/, "")}
-                          </h3>
-                        );
-                      }
-                      if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-                        return (
-                          <ul key={idx} className="list-disc pl-6 space-y-1 text-ink-700">
-                            {trimmed.split("\n").map((line, i) => (
-                              <li key={i}>{line.replace(/^[-*]\s+/, "")}</li>
-                            ))}
-                          </ul>
-                        );
-                      }
-                      return <p key={idx}>{trimmed}</p>;
-                    })
+                <div className="rounded-xl border border-ink-100 bg-white p-6 shadow-xs">
+                  {content ? (
+                    <RichBlogContent content={content} />
                   ) : (
                     <p className="italic text-ink-400">Content body is empty. Type in the editor to view preview.</p>
                   )}
