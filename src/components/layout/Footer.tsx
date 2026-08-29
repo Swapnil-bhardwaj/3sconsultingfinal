@@ -24,7 +24,7 @@ const columns = [
     title: "Company",
     links: [
       { label: "Who We Are", to: "/who-we-are" },
-      { label: "Insights", to: "/insights" },
+      { label: "Gallery", to: "/gallery" },
       { label: "Case Studies", to: "/case-studies" },
       { label: "Contact Us", to: "/contact" },
     ],
@@ -52,7 +52,7 @@ const columns = [
     links: [
       { label: "Blog", to: "/blog" },
       { label: "Learning Resources", to: "/learning-resources" },
-      { label: "Insights", to: "/insights" },
+      { label: "Gallery", to: "/gallery" },
       { label: "Case Studies", to: "/case-studies" },
     ],
   },

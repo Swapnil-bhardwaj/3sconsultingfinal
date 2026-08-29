@@ -6,7 +6,7 @@ import IndustriesSection from "../components/home/IndustriesSection";
 import ApproachSection from "../components/home/ApproachSection";
 import FeaturedProjects from "../components/home/FeaturedProjects";
 import LearningResourcesSection from "../components/home/LearningResourcesSection";
-import InsightsSection from "../components/home/InsightsSection";
+import GallerySection from "../components/home/GallerySection";
 import CaseStudiesSection from "../components/home/CaseStudiesSection";
 import FinalCTA from "../components/home/FinalCTA";
 import SEO from "../components/ui/SEO";
@@ -54,7 +54,7 @@ export default function Home() {
       <ApproachSection />
       <FeaturedProjects />
       <LearningResourcesSection />
-      <InsightsSection />
+      <GallerySection />
       <CaseStudiesSection />
       <FinalCTA />
     </>

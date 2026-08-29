@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Home from "./pages/Home";
 import WhoWeAre from "./pages/WhoWeAre";
@@ -10,8 +10,7 @@ import LearningResources from "./pages/LearningResources";
 import Blogs from "./pages/Blogs";
 import BlogDetail from "./pages/BlogDetail";
 import WriteBlog from "./pages/WriteBlog";
-import Insights from "./pages/Insights";
-import InsightDetail from "./pages/InsightDetail";
+import Gallery from "./pages/Gallery";
 import CaseStudies from "./pages/CaseStudies";
 import CaseStudyDetail from "./pages/CaseStudyDetail";
 import Contact from "./pages/Contact";
@@ -37,8 +36,10 @@ export default function App() {
           <Route path="blog/write" element={<WriteBlog />} />
           <Route path="blog/:slug" element={<BlogDetail />} />
           <Route path="blogs/:slug" element={<BlogDetail />} />
-          <Route path="insights" element={<Insights />} />
-          <Route path="insights/:slug" element={<InsightDetail />} />
+          <Route path="gallery" element={<Gallery />} />
+          {/* Backward compatibility redirects from insights */}
+          <Route path="insights" element={<Navigate to="/gallery" replace />} />
+          <Route path="insights/:slug" element={<Navigate to="/gallery" replace />} />
           <Route path="case-studies" element={<CaseStudies />} />
           <Route path="case-studies/:slug" element={<CaseStudyDetail />} />
           <Route path="contact" element={<Contact />} />

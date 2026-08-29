@@ -357,7 +357,7 @@ export default function LearningResources() {
                         </>
                       ) : (
                         <Link
-                          to="/insights"
+                          to="/blog"
                           className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-800 hover:text-teal-900"
                         >
                           Read Article <ArrowRight className="h-3.5 w-3.5" />

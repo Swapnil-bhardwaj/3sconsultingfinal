@@ -46,7 +46,7 @@ export const primaryNav = [
   { label: "Industries", to: "/industries" },
   { label: "Learning Resources", to: "/learning-resources" },
   { label: "Blog", to: "/blog" },
-  { label: "Insights", to: "/insights" },
+  { label: "Gallery", to: "/gallery" },
   { label: "Case Studies", to: "/case-studies" },
   { label: "Contact Us", to: "/contact" },
 ];
