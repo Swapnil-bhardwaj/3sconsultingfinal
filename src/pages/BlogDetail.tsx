@@ -55,7 +55,7 @@ export default function BlogDetail() {
   };
 
   const handleDelete = () => {
-    if (window.confirm("Are you sure you want to delete this custom blog post?")) {
+    if (window.confirm("Are you sure you want to delete this blog post? It will be removed from your website.")) {
       deleteBlogPost(post.id);
       navigate("/blog");
     }
@@ -129,16 +129,14 @@ export default function BlogDetail() {
                   )}
                 </button>
 
-                {post.isCustom && (
-                  <button
-                    type="button"
-                    onClick={handleDelete}
-                    title="Delete custom post"
-                    className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" /> Delete
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  title="Delete blog post"
+                  className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100 cursor-pointer"
+                >
+                  <Trash2 className="h-3.5 w-3.5" /> Delete
+                </button>
               </div>
             </div>
           </div>

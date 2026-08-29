@@ -1,6 +1,8 @@
 import { BlogPost, seedBlogs } from "../data/blogs";
+import { sanitizeText, isSafeUrl } from "./security";
 
 const STORAGE_KEY = "3sconsulting_blogs_v1";
+const DELETED_KEY = "3sconsulting_deleted_blogs_v1";
 
 function slugify(text: string): string {
   return text
@@ -18,6 +20,18 @@ function calculateReadingTime(text: string): string {
   return `${minutes} min read`;
 }
 
+export function getDeletedBlogIds(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(DELETED_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 export function getStoredCustomBlogs(): BlogPost[] {
   if (typeof window === "undefined") return [];
   try {
@@ -32,12 +46,13 @@ export function getStoredCustomBlogs(): BlogPost[] {
 }
 
 export function getAllBlogs(): BlogPost[] {
-  const customBlogs = getStoredCustomBlogs();
-  // Filter out any seed blogs that might have been updated or merged
+  const deletedIds = new Set(getDeletedBlogIds());
+  const customBlogs = getStoredCustomBlogs().filter((b) => !deletedIds.has(b.id) && !deletedIds.has(b.slug));
   const customSlugs = new Set(customBlogs.map((b) => b.slug));
-  const remainingSeeds = seedBlogs.filter((b) => !customSlugs.has(b.slug));
-  
-  // Custom blogs first, sorted by creation date or publication date
+  const remainingSeeds = seedBlogs.filter(
+    (b) => !customSlugs.has(b.slug) && !deletedIds.has(b.id) && !deletedIds.has(b.slug)
+  );
+
   return [...customBlogs, ...remainingSeeds];
 }
 
@@ -45,8 +60,6 @@ export function getBlogBySlug(slug: string): BlogPost | undefined {
   const all = getAllBlogs();
   return all.find((b) => b.slug === slug || b.id === slug);
 }
-
-import { sanitizeText, isSafeUrl } from "./security";
 
 export function saveBlogPost(input: {
   title: string;
@@ -81,7 +94,8 @@ export function saveBlogPost(input: {
   const safeImage = isSafeUrl(rawImage) ? rawImage : "/images/insight-safety-culture.jpg";
 
   const cleanContent = sanitizeText(input.content);
-  const cleanExcerpt = sanitizeText(input.excerpt) ||
+  const cleanExcerpt =
+    sanitizeText(input.excerpt) ||
     cleanContent.slice(0, 160).replace(/[#*`_]/g, "").trim() + "...";
 
   const cleanAuthor = sanitizeText(input.author || "P.V Sharma");
@@ -118,9 +132,16 @@ export function saveBlogPost(input: {
 
 export function deleteBlogPost(id: string): boolean {
   try {
+    // 1. Remove from custom blogs if present
     const customBlogs = getStoredCustomBlogs();
-    const updated = customBlogs.filter((b) => b.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    const updatedCustom = customBlogs.filter((b) => b.id !== id && b.slug !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCustom));
+
+    // 2. Add to deleted IDs set (so even permanent seed blogs get hidden if requested)
+    const deleted = new Set(getDeletedBlogIds());
+    deleted.add(id);
+    localStorage.setItem(DELETED_KEY, JSON.stringify(Array.from(deleted)));
+
     window.dispatchEvent(new Event("storage"));
     return true;
   } catch (err) {
@@ -132,6 +153,7 @@ export function deleteBlogPost(id: string): boolean {
 export function resetBlogsToDefaults(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(DELETED_KEY);
     window.dispatchEvent(new Event("storage"));
   } catch (err) {
     console.error("Error resetting blogs", err);
